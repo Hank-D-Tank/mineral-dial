@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mineral Dial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700&family=DM+Mono:wght@300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --ink: #151515;
+      --paper: #ffffff;
+      --site-margin: 2em;
+      --mono: "DM Mono", monospace;
+      --sans: "Inter Tight", Arial, sans-serif;
+      --ease: cubic-bezier(0.6, 0, 0, 1);
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: calc(clamp(992px, 100vw, 1920px) / 90);
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .intro {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 1.5em;
+      padding: var(--site-margin);
+    }
+
+    .intro h1 {
+      font-size: 6em;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 0.95;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.75em;
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: -0.025em;
+      opacity: 0.6;
+      line-height: 1;
+    }
+
+    .minerals-stage {
+      position: relative;
+      height: 270vh;
+    }
+
+    .minerals-inner {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: var(--site-margin);
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1em;
+    }
+
+    .minerals-left {
+      grid-column: span 3;
+      position: relative;
+      padding-top: calc(50vh - 2em);
+    }
+
+    .badges {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25em;
+      padding-top: 0.3em;
+    }
+
+    .badge {
+      border: 1px solid var(--ink);
+      border-radius: 0.25em;
+      padding: 0.193em 0.357em 0.257em;
+      font-family: var(--mono);
+      font-size: 0.7em;
+      font-weight: 300;
+      text-transform: uppercase;
+      line-height: 0.9;
+    }
+
+    .badge.is-dark {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .minerals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5em;
+    }
+
+    .mineral-names {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25em;
+    }
+
+    .mineral-name {
+      font-size: 3em;
+      font-weight: 700;
+      letter-spacing: -0.0098em;
+      line-height: 1;
+      opacity: 0.15;
+      transition: opacity 0.25s var(--ease);
+    }
+
+    .mineral-name.is-active {
+      opacity: 1;
+    }
+
+    .minerals-center {
+      grid-column: span 6;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring {
+      position: absolute;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .ring-base {
+      opacity: 0.3;
+    }
+
+    .ring-base g {
+      opacity: 0.3;
+    }
+
+    .ring-active {
+      --angle: 0deg;
+      mask-image: conic-gradient(#000 var(--angle), transparent var(--angle));
+    }
+
+    .minerals-canvas {
+      display: block;
+      width: 100%;
+      height: 60%;
+    }
+
+    .minerals-fade {
+      position: absolute;
+      width: 95%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff0 42%, #fff 69% 70%);
+      pointer-events: none;
+    }
+
+    .minerals-right {
+      grid-column: span 3;
+      padding-top: calc(50vh - 2em);
+      padding-left: 7.25em;
+    }
+
+    .mineral-label {
+      display: flex;
+      gap: 0.25em;
+    }
+
+    .label-line {
+      display: flex;
+      align-items: flex-start;
+      height: 1.6em;
+      margin: -0.3em 0 -0.1em;
+      overflow: hidden;
+    }
+
+    .label-slider {
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s var(--ease);
+    }
+
+    .label-slider span {
+      height: 1.6em;
+      line-height: 1.6em;
+      white-space: nowrap;
+    }
+
+
+
+    .outro {
+      height: 60vh;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 767px) {
+      body {
+        font-size: 16px;
+      }
+
+      .intro h1 {
+        font-size: 3em;
+      }
+
+      .minerals-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 2em;
+        padding: 1em 0;
+      }
+
+      .minerals-left {
+        display: contents;
+      }
+
+      .badges {
+        position: static;
+        order: 1;
+        padding: 0 1em;
+      }
+
+      .minerals-list {
+        order: 4;
+      }
+
+      .minerals-list .eyebrow {
+        display: none;
+      }
+
+      .mineral-names {
+        flex-direction: row;
+        gap: 1em;
+        padding: 1em 1em 0;
+        overflow: hidden;
+      }
+
+      .mineral-name {
+        font-size: 2em;
+      }
+
+      .minerals-center {
+        order: 2;
+        flex: 1;
+      }
+
+      .minerals-canvas {
+        height: auto;
+        aspect-ratio: 1.52;
+      }
+
+      .minerals-right {
+        order: 3;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="intro">
+    <p class="eyebrow">Scroll to explore</p>
+    <h1>Minerals<br>we extract</h1>
+  </section>
+
+  <section class="minerals-stage">
+    <div class="minerals-inner">
+      <div class="minerals-left">
+        <div class="badges">
+          <span class="badge">S.03</span>
+          <h2 class="badge is-dark">Minerals</h2>
+        </div>
+        <div class="minerals-list">
+          <p class="eyebrow">Minerals we extract</p>
+          <div class="mineral-names">
+            <span class="mineral-name is-active">Gold</span>
+            <span class="mineral-name">Silver</span>
+            <span class="mineral-name">Lead</span>
+            <span class="mineral-name">Copper</span>
+            <span class="mineral-name">Zinc</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="minerals-center">
+        <svg class="ring ring-base" viewBox="0 0 616 616" aria-hidden="true"><g></g></svg>
+        <svg class="ring ring-active" viewBox="0 0 616 616" aria-hidden="true"><g></g></svg>
+        <canvas class="minerals-canvas"></canvas>
+        <div class="minerals-fade"></div>
+      </div>
+
+      <div class="minerals-right">
+        <div class="mineral-label eyebrow" aria-hidden="true">
+          <div class="label-line">
+            <div class="label-slider">
+              <span>AU [#79]</span>
+              <span>AG [#47]</span>
+              <span>PB [#82]</span>
+              <span>CU [#29]</span>
+              <span>ZN [#30]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="outro"></section>
+
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    const lenis = new Lenis({ lerp: 0.125 });
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    const stage = document.querySelector(".minerals-stage");
+    const canvas = document.querySelector(".minerals-canvas");
+    const context = canvas.getContext("2d", { alpha: false });
+    const activeRing = document.querySelector(".ring-active");
+    const names = document.querySelectorAll(".mineral-name");
+    const sliders = document.querySelectorAll(".label-slider");
+
+    const frameCount = 600;
+    const frames = [];
+    const sequence = { frame: 0 };
+    let activeIndex = 0;
+
+    document.querySelectorAll(".ring g").forEach((group) => {
+      for (let tick = 0; tick < 180; tick++) {
+        const angle = (tick * 2 * Math.PI) / 180;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", 308 - 308 * Math.cos(angle));
+        line.setAttribute("y1", 308 - 308 * Math.sin(angle));
+        line.setAttribute("x2", 308 - 296 * Math.cos(angle));
+        line.setAttribute("y2", 308 - 296 * Math.sin(angle));
+        line.setAttribute("stroke", "#151515");
+        group.appendChild(line);
+      }
+    });
+
+    for (let index = 0; index < frameCount; index++) {
+      const image = new Image();
+      image.src = `frames/stone-${String(index + 1).padStart(4, "0")}.avif`;
+      image.onload = () => {
+        if (index === Math.round(sequence.frame)) drawFrame();
+      };
+      frames.push(image);
+    }
+
+    function loadedFrame(index) {
+      for (let step = 0; step < frameCount; step++) {
+        const before = frames[index - step];
+        const after = frames[index + step];
+        if (before && before.naturalWidth) return before;
+        if (after && after.naturalWidth) return after;
+      }
+      return null;
+    }
+
+    function resizeCanvas() {
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.round(canvas.clientWidth * ratio);
+      canvas.height = Math.round(canvas.clientHeight * ratio);
+      drawFrame();
+    }
+
+    function drawFrame() {
+      const image = loadedFrame(Math.round(sequence.frame));
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      if (!image) return;
+      const size = Math.min(canvas.width, canvas.height) * 0.85;
+      context.imageSmoothingQuality = "high";
+      context.drawImage(image, (canvas.width - size) / 2, (canvas.height - size) / 2, size, size);
+    }
+
+    function setActive(index) {
+      activeIndex = index;
+      names.forEach((name, nameIndex) => name.classList.toggle("is-active", nameIndex === index));
+      sliders.forEach((slider) => (slider.style.transform = `translateY(${-index * 20}%)`));
+    }
+
+    function updateDial(progress) {
+      activeRing.style.setProperty("--angle", `${progress * 360}deg`);
+      const index = Math.min(names.length - 1, Math.floor(progress * names.length));
+      if (index !== activeIndex) setActive(index);
+    }
+
+    gsap.to(sequence, {
+      frame: frameCount - 1,
+      ease: "none",
+      onUpdate: drawFrame,
+      scrollTrigger: {
+        trigger: stage,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 0.4,
+      },
+    });
+
+    ScrollTrigger.create({
+      trigger: stage,
+      start: "top top",
+      end: "bottom bottom",
+      onUpdate: (self) => updateDial(self.progress),
+    });
+
+    new ResizeObserver(resizeCanvas).observe(canvas);
+  </script>
+</body>
+</html>
